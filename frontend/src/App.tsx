@@ -2,27 +2,85 @@
 import './index.css';
 import logo from './assets/brand-roots-logo.jpeg';
 
-const services = [
+
+const domains = [
   {
-    number: '01',
-    title: 'Brand Strategy',
+    name: 'ROOTFIND',
+    subtitle: 'Discover the real problem.',
+    words: 'UNDERSTAND · ANALYSE · UNCOVER',
     description:
-      'Build a distinctive restaurant brand, clarify your positioning, and create an identity guests remember.',
-    detail: 'Build your identity',
+      "We go beyond assumptions to find what's truly holding your business back.",
+    services: [
+      {
+        name: 'SME Growth Diagnosis',
+        description: 'Find where your business is losing growth.',
+      },
+      {
+        name: 'Business Position Gap',
+        description: 'Identify your differentiation and market position.',
+      },
+      {
+        name: 'Customer Research Gap',
+        description: 'Reveal what your customers really think and want.',
+      },
+      {
+        name: 'Customer Intelligence',
+        description: 'Turn insights into actionable customer strategy.',
+      },
+    ],
+    price: '₹4,999',
+    duration: '2–4 weeks',
   },
   {
-    number: '02',
-    title: 'Restaurant Growth',
+    name: 'ROOTBUILD',
+    subtitle: 'Build a stronger business & brand.',
+    words: 'STRATEGIC · CREATE · TRANSFORM',
     description:
-      'Discover growth opportunities, attract the right customers, and build a stronger path to revenue.',
-    detail: 'Unlock your potential',
+      'We build the foundations that make your business stronger, smarter and more relevant.',
+    services: [
+      {
+        name: 'Traditional Business → Modern Business',
+        description: 'Modernise your systems, branding and go-to-market.',
+      },
+      {
+        name: 'Founder → Brand',
+        description: 'Turn your business into a powerful brand.',
+      },
+      {
+        name: 'Brand Experience Design',
+        description: 'Create consistent, memorable customer experiences.',
+      },
+      {
+        name: 'Revenue Leak / Conversion Counselling',
+        description: "Find what's blocking your revenue.",
+      },
+    ],
+    price: '₹14,999',
+    duration: '4–8 weeks',
   },
   {
-    number: '03',
-    title: 'Operations & Experience',
+    name: 'ROOTGROW',
+    subtitle: 'Create a system for continuous growth.',
+    words: 'OPTIMISE · AUTOMATE · SCALE',
     description:
-      'Improve everyday operations and create thoughtful dining experiences that bring guests back.',
-    detail: 'Improve your systems',
+      'We turn your foundation into a repeatable growth engine.',
+    services: [
+      {
+        name: 'Customer Lifetime Value',
+        description: 'Build retention, repeat purchases and referrals.',
+      },
+      {
+        name: 'Marketing OS',
+        description: 'Create a structured, measurable marketing system.',
+      },
+      {
+        name: 'Fractional Growth Department',
+        description: 'Get ongoing growth leadership and execution support.',
+      },
+    ],
+    price: '₹24,999',
+    duration: '2–8 weeks',
+    recurring: 'per month',
   },
 ];
 
@@ -101,32 +159,75 @@ function App() {
           </p>
         </section>
 
+        
         <section className="services-section" id="services">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">What we do</p>
-              <h2>Strong roots. <span>Lasting impact.</span></h2>
+              <p className="eyebrow">Our 11 services · Three domains</p>
+              <h2>
+                Three paths.
+                <span> One goal — your growth.</span>
+              </h2>
             </div>
             <p className="section-description">
-              Practical expertise for the challenges that matter most to
-              your restaurant business.
+              Tailored solutions for every stage of your business journey.
             </p>
           </div>
 
-          <div className="services-grid">
-            {services.map((service) => (
-              <article className="service-card" key={service.number}>
-                <span className="service-number">{service.number}</span>
-                <div className="service-mark" aria-hidden="true">✳</div>
-                <h3>{service.title}</h3>
-                <p>{service.description}</p>
-                <a className="service-link" href="#contact">
-                  {service.detail} <span aria-hidden="true">→</span>
-                </a>
+          <div className="domain-grid">
+            {domains.map((domain, index) => (
+              <article className="domain-card" key={domain.name}>
+                <div className="domain-topline">
+                  <span className="domain-index">0{index + 1}</span>
+                  <span className="domain-words">{domain.words}</span>
+                </div>
+
+                <p className="domain-name">{domain.name}</p>
+                <h3>{domain.subtitle}</h3>
+                <p className="domain-description">{domain.description}</p>
+
+                <div className="domain-services">
+                  {domain.services.map((service, serviceIndex) => (
+                    <div className="domain-service" key={service.name}>
+                      <span className="service-count">
+                        {String(
+                          domains
+                            .slice(0, index)
+                            .reduce((total, item) => total + item.services.length, 0)
+                          + serviceIndex + 1
+                        ).padStart(2, '0')}
+                      </span>
+                      <div>
+                        <h4>{service.name}</h4>
+                        <p>{service.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="domain-investment">
+                  <div>
+                    <span className="investment-label">Starting from</span>
+                    <p className="investment-price">{domain.price}</p>
+                    <span className="investment-duration">
+                      {domain.duration}
+                      {domain.recurring ? ` · ${domain.recurring}` : ''}
+                    </span>
+                  </div>
+                  <a
+                    className="button button-gold"
+                    href={`mailto:hello@brandroots.com?subject=${encodeURIComponent(
+                      `${domain.name} consultation`
+                    )}`}
+                  >
+                    Consult now <span aria-hidden="true">↗</span>
+                  </a>
+                </div>
               </article>
             ))}
           </div>
         </section>
+
 
         <section className="approach" id="approach">
           <div className="approach-mark" aria-hidden="true">BR</div>
