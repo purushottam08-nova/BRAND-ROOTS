@@ -1,32 +1,35 @@
+@'
 # BRAND-ROOTS
-A brand growth and strategy partner for hotels, family restaurants and hospitality businesses across India
 
+**From Roots to Recognition.**
 
-## Project Goals
+BRAND-ROOTS is a business consulting and growth management platform.
 
-- Public-facing website for the business
-- Internal business workspace and CRM
-- Restaurant client portal
-- Secure authentication and role-based access
-- Organized business data and workflows
-- Automated testing and deployment readiness
+## Portals
 
-## Planned Technology Stack
+- Client Portal: Client registration, plans, project tracking, payments, milestones and deliverables.
+- Team Portal: Internal client management, payment verification, project progress and team collaboration.
 
-- Frontend: React, TypeScript, Vite, Tailwind CSS
+## Technology Stack
+
+- Frontend: React, TypeScript, Vite
 - Backend: Python, FastAPI
 - Database: PostgreSQL
-- ORM and migrations: SQLAlchemy, Alembic
-- Testing: Pytest and frontend testing tools
-- Version control: Git and GitHub
+- ORM: SQLAlchemy
+- Migrations: Alembic
+- Authentication: JWT and Argon2
 
-## Project Status
+## Project Structure
 
-Currently in the initial setup and foundation phase.
+- `frontend/` — Client Portal
+- `backend/` — Shared API and business logic
+- `data/` — Seed and reference data
+- `docs/` — Project documentation
+- `scripts/` — Development and maintenance scripts
+- `tests/` — Automated tests
 
-## Development Principles
+## Development
 
-- Keep credentials and secrets out of version control.
-- Build modular, maintainable components.
-- Test important functionality.
-- Protect client data with appropriate access controls.
+All development work is done on the `dev` branch.
+Changes are merged into `main` through pull requests.
+'@ | Set-Content -Path README.md -Encoding utf8

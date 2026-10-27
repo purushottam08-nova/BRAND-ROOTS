@@ -1,272 +1,461 @@
 
-import './index.css';
-import logo from './assets/brand-roots-logo.jpeg';
+import { useState } from "react";
+import "./App.css";
 
-
-const domains = [
+const services = [
   {
-    name: 'ROOTFIND',
-    subtitle: 'Discover the real problem.',
-    words: 'UNDERSTAND · ANALYSE · UNCOVER',
+    id: "01",
+    name: "ROOTFIND",
+    category: "UNDERSTAND · ANALYSE · UNCOVER",
+    title: "Discover the real problem.",
     description:
-      "We go beyond assumptions to find what's truly holding your business back.",
-    services: [
-      {
-        name: 'SME Growth Diagnosis',
-        description: 'Find where your business is losing growth.',
-      },
-      {
-        name: 'Business Position Gap',
-        description: 'Identify your differentiation and market position.',
-      },
-      {
-        name: 'Customer Research Gap',
-        description: 'Reveal what your customers really think and want.',
-      },
-      {
-        name: 'Customer Intelligence',
-        description: 'Turn insights into actionable customer strategy.',
-      },
+      "Understand your business, uncover growth barriers, and find the opportunities that matter.",
+    items: [
+      "SME Growth Diagnosis",
+      "Business Position Gap",
+      "Customer Research Gap",
+      "Customer Intelligence",
     ],
-    price: '₹4,999',
-    duration: '2–4 weeks',
+    tone: "green",
   },
   {
-    name: 'ROOTBUILD',
-    subtitle: 'Build a stronger business & brand.',
-    words: 'STRATEGIC · CREATE · TRANSFORM',
+    id: "02",
+    name: "ROOTBUILD",
+    category: "STRATEGIC · CREATE · TRANSFORM",
+    title: "Build a stronger business & brand.",
     description:
-      'We build the foundations that make your business stronger, smarter and more relevant.',
-    services: [
-      {
-        name: 'Traditional Business → Modern Business',
-        description: 'Modernise your systems, branding and go-to-market.',
-      },
-      {
-        name: 'Founder → Brand',
-        description: 'Turn your business into a powerful brand.',
-      },
-      {
-        name: 'Brand Experience Design',
-        description: 'Create consistent, memorable customer experiences.',
-      },
-      {
-        name: 'Revenue Leak / Conversion Counselling',
-        description: "Find what's blocking your revenue.",
-      },
+      "Turn business insights into a meaningful brand, better experiences, and a stronger foundation.",
+    items: [
+      "Traditional Business → Modern Business",
+      "Founder → Brand",
+      "Brand Experience Design",
+      "Revenue Leak / Conversion Counselling",
     ],
-    price: '₹14,999',
-    duration: '4–8 weeks',
+    tone: "gold",
   },
   {
-    name: 'ROOTGROW',
-    subtitle: 'Create a system for continuous growth.',
-    words: 'OPTIMISE · AUTOMATE · SCALE',
+    id: "03",
+    name: "ROOTGROW",
+    category: "OPTIMISE · AUTOMATE · SCALE",
+    title: "Create a system for continuous growth.",
     description:
-      'We turn your foundation into a repeatable growth engine.',
-    services: [
-      {
-        name: 'Customer Lifetime Value',
-        description: 'Build retention, repeat purchases and referrals.',
-      },
-      {
-        name: 'Marketing OS',
-        description: 'Create a structured, measurable marketing system.',
-      },
-      {
-        name: 'Fractional Growth Department',
-        description: 'Get ongoing growth leadership and execution support.',
-      },
+      "Optimise your business, build repeatable systems, and scale with clarity.",
+    items: [
+      "Customer Lifetime Value",
+      "Marketing OS",
+      "Fractional Growth Department",
     ],
-    price: '₹24,999',
-    duration: '2–8 weeks',
-    recurring: 'per month',
+    tone: "grey",
+  },
+];
+
+const approach = [
+  {
+    number: "01",
+    title: "Understand",
+    description:
+      "We begin by listening, asking the right questions, and understanding your business from its roots.",
+  },
+  {
+    number: "02",
+    title: "Build",
+    description:
+      "We turn insight into strategy, create a clear direction, and strengthen your business foundation.",
+  },
+  {
+    number: "03",
+    title: "Grow",
+    description:
+      "We help you establish systems and practices that support sustainable, meaningful growth.",
   },
 ];
 
 function App() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const closeMenu = () => setMenuOpen(false);
+
   return (
-    <div className="site-shell">
-      <header className="navbar">
-        <a className="brand" href="#home" aria-label="Brand Roots home">
-          <img src={logo} alt="Brand Roots logo" className="brand-logo" />
-        </a>
+    <main className="site-shell" id="home">
+      <div className="chassis">
+        <div className="chassis-topline">
+          <span className="machine-label">BR / 001</span>
+          <span className="machine-label">BUSINESS GROWTH INSTRUMENT</span>
+          <span className="machine-indicator">
+            <span className="indicator-light" />
+            BRAND-ROOTS
+          </span>
+        </div>
 
-        <nav className="nav-links" aria-label="Main navigation">
-          <a href="#services">Services</a>
-          <a href="#approach">Our approach</a>
-          <a href="#about">About</a>
-        </nav>
+        <header className="navbar">
+          <a className="brand" href="#home" aria-label="BRAND-ROOTS home">
+            <span className="brand-mark" aria-hidden="true">
+              B<span>R</span>
+            </span>
 
-        <a className="button button-gold nav-cta" href="#contact">
-          Let's talk <span aria-hidden="true">↗</span>
-        </a>
-      </header>
+            <span className="brand-copy">
+              <strong>BRAND-ROOTS</strong>
+              <small>FROM ROOTS TO RECOGNITION.</small>
+            </span>
+          </a>
 
-      <main>
-        <section className="hero" id="home">
-          <div className="hero-decoration" aria-hidden="true">✳</div>
+          <button
+            className="menu-toggle raised-key"
+            type="button"
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label={menuOpen ? "Close navigation" : "Open navigation"}
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? "×" : "☰"}
+          </button>
 
+          <nav
+            className={`nav-links ${menuOpen ? "open" : ""}`}
+            aria-label="Main navigation"
+          >
+            <a href="#services" onClick={closeMenu}>
+              Services
+            </a>
+            <a href="#approach" onClick={closeMenu}>
+              Approach
+            </a>
+            <a href="#about" onClick={closeMenu}>
+              About
+            </a>
+            <a href="#contact" onClick={closeMenu}>
+              Contact
+            </a>
+          </nav>
+
+          <a className="nav-action raised-key" href="#contact">
+            <span>LET&apos;S TALK</span>
+            <span className="key-arrow">↗</span>
+          </a>
+        </header>
+
+        <section className="hero">
           <div className="hero-content">
-            <p className="eyebrow">
-              Restaurant consulting & growth management
-            </p>
+            <div className="section-label">
+              <span className="label-number">01</span>
+              <span>BUSINESS CONSULTING · GROWTH MANAGEMENT</span>
+            </div>
 
             <h1>
-              Grow with purpose.
-              <span>Lead with confidence.</span>
+              Every great
+              <br />
+              business has
+              <br />
+              <span>strong roots.</span>
             </h1>
 
             <p className="hero-description">
-              Strategic thinking. Stronger systems. Sustainable growth.
-              We help restaurants build their next chapter from the roots up.
+              We help businesses uncover what&apos;s holding them back, build
+              stronger brands, and create systems for sustainable growth.
             </p>
 
             <div className="hero-actions">
-              <a className="button button-gold" href="#contact">
-                Let's talk growth <span aria-hidden="true">→</span>
+              <a className="primary-key" href="#services">
+                <span>EXPLORE OUR SERVICES</span>
+                <span className="key-arrow">↗</span>
               </a>
-              <a className="text-link" href="#services">
-                Explore our services <span aria-hidden="true">↓</span>
+
+              <a className="secondary-key" href="#approach">
+                OUR APPROACH
               </a>
             </div>
 
-            <div className="hero-note">
-              <span className="note-line" />
-              Thoughtfully built. Intentionally grown.
+            <div className="hero-footnote">
+              <span className="gold-indicator" />
+              <span>
+                CLARITY IN STRATEGY.
+                <br />
+                PURPOSE IN GROWTH.
+              </span>
             </div>
           </div>
 
-          <div className="hero-side">
-            <div className="hero-side-content">
-              <span className="side-label">THE BRAND ROOTS APPROACH</span>
-              <p>Rooted in strategy.</p>
-              <p className="gold-text">Designed for growth.</p>
+          <div className="hero-instrument" aria-label="Brand Roots identity">
+            <div className="instrument-heading">
+              <span>BR / IDENTITY</span>
+              <span>EST. IN PURPOSE</span>
+            </div>
+
+            <div className="logo-well">
+              <div className="logo-emblem">
+                <span className="emblem-b">B</span>
+                <span className="emblem-r">R</span>
+                <span className="emblem-tree">♧</span>
+                <span className="emblem-roots">╱╲</span>
+              </div>
+
+              <div className="emblem-name">BRAND ROOTS</div>
+              <div className="emblem-divider">
+                <span />
+                <span className="divider-leaf">✦</span>
+                <span />
+              </div>
+              <div className="emblem-tagline">
+                FROM ROOTS TO RECOGNITION.
+              </div>
+            </div>
+
+            <div className="instrument-footer">
+              <span>STRATEGY</span>
+              <span className="footer-dot" />
+              <span>IDENTITY</span>
+              <span className="footer-dot" />
+              <span>GROWTH</span>
             </div>
           </div>
         </section>
 
-        <section className="intro" id="about">
-          <p className="eyebrow">More than advice. A growth partner.</p>
-          <h2>
-            Great restaurants deserve
-            <span> a foundation built to last.</span>
-          </h2>
-          <p className="intro-description">
-            Every restaurant has a story and a vision. We help turn that
-            vision into a clear strategy, stronger operations, and meaningful
-            long-term progress.
-          </p>
+        <section className="facts-panel" aria-label="Our philosophy">
+          <div className="fact-cell">
+            <span className="fact-label">OUR BELIEF</span>
+            <strong>Growth begins at the roots.</strong>
+          </div>
+
+          <div className="fact-cell">
+            <span className="fact-label">OUR METHOD</span>
+            <strong>Understand. Build. Grow.</strong>
+          </div>
+
+          <div className="fact-cell">
+            <span className="fact-label">OUR PURPOSE</span>
+            <strong>From roots to recognition.</strong>
+          </div>
         </section>
 
-        
-        <section className="services-section" id="services">
+        <section className="intro-section" id="about">
           <div className="section-heading">
+            <div className="section-label">
+              <span className="label-number">02</span>
+              <span>OUR PHILOSOPHY</span>
+            </div>
+
+            <h2>
+              Growth isn&apos;t
+              <br />
+              a shortcut.
+              <br />
+              <span>It&apos;s a foundation.</span>
+            </h2>
+          </div>
+
+          <div className="editorial-well">
+            <div className="editorial-topline">
+              <span>BR / PRINCIPLE</span>
+              <span>NO. 001</span>
+            </div>
+
+            <div className="editorial-mark">“</div>
+
+            <p>
+              Every business has a story, a purpose, and untapped potential.
+              We bring clarity to the challenges, strategy to the decisions,
+              and structure to the growth.
+            </p>
+
+            <div className="editorial-signature">
+              <span className="signature-line" />
+              <span>THE BRAND-ROOTS APPROACH</span>
+            </div>
+          </div>
+        </section>
+
+        <section className="services-section" id="services">
+          <div className="section-top">
             <div>
-              <p className="eyebrow">Our 11 services · Three domains</p>
+              <div className="section-label">
+                <span className="label-number">03</span>
+                <span>OUR SERVICES</span>
+              </div>
+
               <h2>
-                Three paths.
-                <span> One goal — your growth.</span>
+                Three roots.
+                <br />
+                <span>One stronger business.</span>
               </h2>
             </div>
+
             <p className="section-description">
-              Tailored solutions for every stage of your business journey.
+              From understanding your business to building its future and
+              growing it sustainably.
             </p>
           </div>
 
-          <div className="domain-grid">
-            {domains.map((domain, index) => (
-              <article className="domain-card" key={domain.name}>
-                <div className="domain-topline">
-                  <span className="domain-index">0{index + 1}</span>
-                  <span className="domain-words">{domain.words}</span>
-                </div>
+          <div className="services-deck">
+            <div className="deck-topline">
+              <span>SERVICE MODULES</span>
+              <span>BR / 03</span>
+            </div>
 
-                <p className="domain-name">{domain.name}</p>
-                <h3>{domain.subtitle}</h3>
-                <p className="domain-description">{domain.description}</p>
-
-                <div className="domain-services">
-                  {domain.services.map((service, serviceIndex) => (
-                    <div className="domain-service" key={service.name}>
-                      <span className="service-count">
-                        {String(
-                          domains
-                            .slice(0, index)
-                            .reduce((total, item) => total + item.services.length, 0)
-                          + serviceIndex + 1
-                        ).padStart(2, '0')}
-                      </span>
-                      <div>
-                        <h4>{service.name}</h4>
-                        <p>{service.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="domain-investment">
-                  <div>
-                    <span className="investment-label">Starting from</span>
-                    <p className="investment-price">{domain.price}</p>
-                    <span className="investment-duration">
-                      {domain.duration}
-                      {domain.recurring ? ` · ${domain.recurring}` : ''}
-                    </span>
+            <div className="services-grid">
+              {services.map((service) => (
+                <article
+                  className={`service-card ${service.tone}`}
+                  key={service.id}
+                >
+                  <div className="service-topline">
+                    <span className="service-number">{service.id}</span>
+                    <span className="service-lamp" aria-hidden="true" />
                   </div>
+
+                  <span className="service-category">{service.category}</span>
+
+                  <h3>{service.name}</h3>
+                  <h4>{service.title}</h4>
+                  <p>{service.description}</p>
+
+                  <div className="service-divider" />
+
+                  <span className="list-label">SERVICE SCOPE</span>
+
+                  <ul className="service-list">
+                    {service.items.map((item) => (
+                      <li key={item}>
+                        <span className="list-marker">↗</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+
                   <a
-                    className="button button-gold"
-                    href={`mailto:hello@brandroots.com?subject=${encodeURIComponent(
-                      `${domain.name} consultation`
-                    )}`}
+                    className="service-key"
+                    href="#contact"
+                    aria-label={`Enquire about ${service.name}`}
                   >
-                    Consult now <span aria-hidden="true">↗</span>
+                    <span>EXPLORE {service.name}</span>
+                    <span className="key-arrow">↗</span>
                   </a>
+                </article>
+              ))}
+            </div>
+
+            <div className="deck-bottomline">
+              <span>STRATEGY / DESIGN / GROWTH</span>
+              <span className="deck-screw" aria-hidden="true" />
+            </div>
+          </div>
+        </section>
+
+        <section className="approach-section" id="approach">
+          <div className="section-label">
+            <span className="label-number">04</span>
+            <span>HOW WE WORK</span>
+          </div>
+
+          <div className="approach-heading">
+            <h2>
+              A thoughtful process.
+              <br />
+              <span>Built around your business.</span>
+            </h2>
+
+            <p>
+              We believe meaningful growth comes from understanding the
+              foundations before changing the structure.
+            </p>
+          </div>
+
+          <div className="process-deck">
+            {approach.map((step, index) => (
+              <article className="process-step" key={step.number}>
+                <div className="process-number">{step.number}</div>
+
+                <div className="process-connector" aria-hidden="true">
+                  <span />
                 </div>
+
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
+
+                {index < approach.length - 1 && (
+                  <span className="process-arrow" aria-hidden="true">
+                    →
+                  </span>
+                )}
               </article>
             ))}
           </div>
         </section>
 
+        <section className="closing-bay" id="contact">
+          <div className="closing-copy">
+            <div className="section-label">
+              <span className="label-number">05</span>
+              <span>START A CONVERSATION</span>
+            </div>
 
-        <section className="approach" id="approach">
-          <div className="approach-mark" aria-hidden="true">BR</div>
-          <div>
-            <p className="eyebrow">From roots to recognition</p>
-            <h2>Build with intention.<br />Grow with clarity.</h2>
+            <h2>
+              Let&apos;s build
+              <br />
+              something that
+              <br />
+              <span>grows with purpose.</span>
+            </h2>
+
+            <p>
+              Tell us a little about your business and what you&apos;re
+              looking to achieve.
+            </p>
           </div>
-          <p className="approach-copy">
-            Sustainable growth starts with understanding where you are,
-            defining where you want to go, and creating a plan to get there.
-          </p>
+
+          <div className="contact-instrument">
+            <div className="contact-screen">
+              <span className="screen-label">BR / CONTACT</span>
+
+              <div className="contact-symbol">✦</div>
+
+              <h3>Ready to grow?</h3>
+
+              <p>
+                Let&apos;s understand your business and explore how we can
+                help.
+              </p>
+
+              <a
+                className="primary-key contact-key"
+                href="mailto:hello@brand-roots.in"
+              >
+                <span>GET IN TOUCH</span>
+                <span className="key-arrow">↗</span>
+              </a>
+            </div>
+
+            <div className="contact-hardware">
+              <span className="hardware-slot" />
+              <span className="hardware-slot" />
+              <span className="hardware-slot" />
+            </div>
+          </div>
         </section>
 
-        <section className="contact-section" id="contact">
-          <p className="eyebrow">Your next chapter starts here</p>
-          <h2>Ready to grow <span>with purpose?</span></h2>
-          <p>
-            Let's start a conversation about your restaurant and its potential.
-          </p>
-          <a
-            className="button button-gold"
-            href="mailto:hello@brandroots.com?subject=Restaurant%20Consultation"
-          >
-            Start a conversation <span aria-hidden="true">↗</span>
+        <footer className="footer">
+          <a className="brand footer-brand" href="#home">
+            <span className="brand-mark" aria-hidden="true">
+              B<span>R</span>
+            </span>
+
+            <span className="brand-copy">
+              <strong>BRAND-ROOTS</strong>
+              <small>FROM ROOTS TO RECOGNITION.</small>
+            </span>
           </a>
-          <small>
-            Replace this sample email with your official business email before launch.
-          </small>
-        </section>
-      </main>
 
-      <footer className="footer">
-        <a href="#home" className="footer-brand">
-          <img src={logo} alt="Brand Roots" />
-        </a>
-        <p>From roots to recognition.</p>
-        <span>© {new Date().getFullYear()} BRAND ROOTS. All rights reserved.</span>
-      </footer>
-    </div>
+          <p>Building stronger businesses, from the ground up.</p>
+
+          <span className="footer-copy">
+            © {new Date().getFullYear()} BRAND-ROOTS
+          </span>
+        </footer>
+
+        <div className="chassis-bottomline">
+          <span>BRAND-ROOTS / GROWTH MANAGEMENT</span>
+          <span>DESIGNED WITH PURPOSE</span>
+        </div>
+      </div>
+    </main>
   );
 }
 
