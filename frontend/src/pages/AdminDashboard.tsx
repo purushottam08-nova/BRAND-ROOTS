@@ -1,3 +1,4 @@
+
 import { useCallback, useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import {
@@ -55,7 +56,10 @@ const UPDATE_STATUSES = [
 ];
 
 export default function AdminDashboard() {
-  const { token, role, isAuthenticated } = useAuth();
+  const { token, role, isAuthenticated, user } = useAuth();
+
+  // Personalized admin name
+  const adminName = user?.name?.trim() || "Admin";
 
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -102,6 +106,13 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     void fetchEnquiries();
+
+    const interval = setInterval(
+      () => void fetchEnquiries(),
+      30000
+    );
+
+    return () => clearInterval(interval);
   }, [fetchEnquiries]);
 
   async function updateStatus(
@@ -142,15 +153,21 @@ export default function AdminDashboard() {
     }
   }
 
-  async function postProgressUpdate(enquiryId: number) {
+  async function postProgressUpdate(
+    enquiryId: number
+  ) {
     if (!token) return;
 
     const draft = updateDrafts[enquiryId];
 
-    if (!draft?.title.trim() || !draft?.description.trim()) {
+    if (
+      !draft?.title.trim() ||
+      !draft?.description.trim()
+    ) {
       setUpdateError(
         "Please enter both update title and description."
       );
+
       setUpdateMessage("");
       return;
     }
@@ -237,17 +254,19 @@ export default function AdminDashboard() {
       {/* Dashboard Header */}
       <div className="admin-header">
         <div>
-          <span className="eyebrow">OWNER CONTROL PANEL</span>
+          <span className="eyebrow">
+            OWNER CONTROL PANEL
+          </span>
 
           <h1>
-            Enquiry
+            Welcome,
             <br />
-            <em>Dashboard.</em>
+            <em>{adminName}!</em>
           </h1>
 
           <p>
-            Manage incoming business enquiries and track their
-            progress.
+            Manage your clients, track progress,
+            and grow BRAND-ROOTS.
           </p>
         </div>
 
@@ -265,6 +284,7 @@ export default function AdminDashboard() {
           ) : (
             <RefreshCw size={18} />
           )}
+
           Refresh
         </button>
       </div>
@@ -302,7 +322,9 @@ export default function AdminDashboard() {
             <h2>All Enquiries</h2>
           </div>
 
-          <span>{enquiries.length} records</span>
+          <span>
+            {enquiries.length} records
+          </span>
         </div>
 
         {loading ? (
@@ -311,11 +333,13 @@ export default function AdminDashboard() {
               size={28}
               className="animate-spin"
             />
+
             <p>Loading enquiries...</p>
           </div>
         ) : enquiries.length === 0 ? (
           <div className="admin-empty">
             <h3>No enquiries yet</h3>
+
             <p>
               New business enquiries will appear here.
             </p>
@@ -337,7 +361,9 @@ export default function AdminDashboard() {
                         ENQUIRY #{enquiry.id}
                       </span>
 
-                      <h3>{enquiry.business_name}</h3>
+                      <h3>
+                        {enquiry.business_name}
+                      </h3>
                     </div>
 
                     <select
@@ -416,7 +442,9 @@ export default function AdminDashboard() {
 
                   {/* Progress Update Form */}
                   <div className="admin-progress-update">
-                    <h4>Post Project Update</h4>
+                    <h4>
+                      Post Project Update
+                    </h4>
 
                     <input
                       type="text"
@@ -436,7 +464,9 @@ export default function AdminDashboard() {
                       placeholder="Describe the work completed or next steps..."
                       aria-label={`Update description for enquiry ${enquiry.id}`}
                       rows={3}
-                      value={draft?.description ?? ""}
+                      value={
+                        draft?.description ?? ""
+                      }
                       onChange={(event) =>
                         updateDraftField(
                           enquiry.id,
@@ -459,29 +489,34 @@ export default function AdminDashboard() {
                         )
                       }
                     >
-                      {UPDATE_STATUSES.map((status) => (
-                        <option
-                          key={status}
-                          value={status}
-                        >
-                          {status
-                            .replace("_", " ")
-                            .toUpperCase()}
-                        </option>
-                      ))}
+                      {UPDATE_STATUSES.map(
+                        (status) => (
+                          <option
+                            key={status}
+                            value={status}
+                          >
+                            {status
+                              .replace("_", " ")
+                              .toUpperCase()}
+                          </option>
+                        )
+                      )}
                     </select>
 
                     <button
                       type="button"
                       className="button button-dark"
                       onClick={() =>
-                        void postProgressUpdate(enquiry.id)
+                        void postProgressUpdate(
+                          enquiry.id
+                        )
                       }
                       disabled={
                         postingUpdateId === enquiry.id
                       }
                     >
-                      {postingUpdateId === enquiry.id ? (
+                      {postingUpdateId ===
+                      enquiry.id ? (
                         <LoaderCircle
                           size={16}
                           className="animate-spin"
@@ -489,6 +524,7 @@ export default function AdminDashboard() {
                       ) : (
                         <Send size={16} />
                       )}
+
                       Post Update
                     </button>
                   </div>
@@ -514,4 +550,3 @@ export default function AdminDashboard() {
     </section>
   );
 }
-
