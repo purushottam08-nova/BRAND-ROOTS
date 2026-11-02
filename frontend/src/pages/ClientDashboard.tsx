@@ -1,31 +1,30 @@
-import { useCallback, useEffect, useState } from "react";
+
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Navigate } from "react-router-dom";
+
 import {
-  RefreshCw,
-  LoaderCircle,
+  ArrowUpRight,
   BriefcaseBusiness,
   CalendarDays,
-  Clock,
+  CheckCircle2,
+  Clock3,
+  FileText,
+  LoaderCircle,
+  MessageSquareText,
+  RefreshCw,
+  Search,
+  Sparkles,
 } from "lucide-react";
 
 import { apiRequest } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 
-type ClientPlan = {
+type ClientEnquiry = {
   id: number;
   service_name: string;
   plan_name: string;
   business_name: string;
   message: string;
-  status: string;
-  created_at: string;
-};
-
-type ProgressUpdate = {
-  id: number;
-  enquiry_id: number;
-  title: string;
-  description: string;
   status: string;
   created_at: string;
 };
@@ -38,17 +37,59 @@ const STATUS_LABELS: Record<string, string> = {
   rejected: "Closed",
 };
 
+function getStatusLabel(status: string) {
+  return (
+    STATUS_LABELS[status] ??
+    status.replace(/_/g, " ")
+  );
+}
+
+function getStatusClass(status: string) {
+  switch (status) {
+    case "completed":
+      return "br-status-completed";
+
+    case "in_progress":
+      return "br-status-progress";
+
+    case "contacted":
+      return "br-status-contacted";
+
+    case "rejected":
+      return "br-status-closed";
+
+    default:
+      return "br-status-pending";
+  }
+}
+
+function formatDate(date: string) {
+  if (!date) return "Date unavailable";
+
+  const parsedDate = new Date(date);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "Date unavailable";
+  }
+
+  return parsedDate.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
 export default function ClientDashboard() {
   const { token, role, isAuthenticated } = useAuth();
 
-  const [plans, setPlans] = useState<ClientPlan[]>([]);
-  const [progressUpdates, setProgressUpdates] =
-    useState<ProgressUpdate[]>([]);
+  const [enquiries, setEnquiries] =
+    useState<ClientEnquiry[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
 
-  const fetchPlans = useCallback(async () => {
+  const fetchEnquiries = useCallback(async () => {
     if (!token) {
       setLoading(false);
       return;
@@ -58,26 +99,18 @@ export default function ClientDashboard() {
     setError("");
 
     try {
-      const [plansData, updatesData] = await Promise.all([
-        apiRequest<ClientPlan[]>(
-          "/api/v1/enquiries/my",
-          {},
-          token
-        ),
-        apiRequest<ProgressUpdate[]>(
-          "/api/v1/enquiries/my/updates",
-          {},
-          token
-        ),
-      ]);
+      const data = await apiRequest<ClientEnquiry[]>(
+        "/api/v1/enquiries/my",
+        {},
+        token
+      );
 
-      setPlans(plansData);
-      setProgressUpdates(updatesData);
+      setEnquiries(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "Unable to load your dashboard."
+          : "Unable to load your enquiries."
       );
     } finally {
       setLoading(false);
@@ -85,8 +118,42 @@ export default function ClientDashboard() {
   }, [token]);
 
   useEffect(() => {
-    void fetchPlans();
-  }, [fetchPlans]);
+    void fetchEnquiries();
+  }, [fetchEnquiries]);
+
+  const filteredEnquiries = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    if (!query) return enquiries;
+
+    return enquiries.filter((enquiry) => {
+      return [
+        enquiry.plan_name,
+        enquiry.service_name,
+        enquiry.business_name,
+        enquiry.message,
+        enquiry.status,
+      ]
+        .filter(Boolean)
+        .some((value) =>
+          value.toLowerCase().includes(query)
+        );
+    });
+  }, [enquiries, search]);
+
+  const pendingCount = enquiries.filter(
+    (enquiry) =>
+      enquiry.status === "pending" ||
+      enquiry.status === "contacted"
+  ).length;
+
+  const activeCount = enquiries.filter(
+    (enquiry) => enquiry.status === "in_progress"
+  ).length;
+
+  const completedCount = enquiries.filter(
+    (enquiry) => enquiry.status === "completed"
+  ).length;
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -97,184 +164,479 @@ export default function ClientDashboard() {
   }
 
   return (
-    <section className="client-dashboard section-padding">
-      {/* Dashboard Header */}
-      <div className="section-heading">
-        <span className="eyebrow">
-          YOUR BRAND-ROOTS SPACE
-        </span>
+    <section className="br-client-dashboard">
 
-        <h1>
-          Client <em>Dashboard</em>
-        </h1>
+      {/* Dashboard Hero */}
+      <div className="br-dashboard-hero">
+        <div className="br-dashboard-hero-inner">
 
-        <p>
-          Track your selected plans, project status, and
-          updates from BRAND-ROOTS.
-        </p>
-      </div>
+          <div className="br-dashboard-welcome">
+            <div className="br-dashboard-eyebrow">
+              <Sparkles size={14} />
 
-      {/* Toolbar */}
-      <div className="dashboard-toolbar">
-        <h2>Your Projects</h2>
+              YOUR BRAND-ROOTS SPACE
+            </div>
 
-        <button
-          type="button"
-          className="button button-outline-dark"
-          onClick={() => void fetchPlans()}
-          disabled={loading}
-        >
-          {loading ? (
-            <LoaderCircle size={16} className="spin" />
-          ) : (
-            <RefreshCw size={16} />
-          )}
-          Refresh
-        </button>
-      </div>
+            <h1>
+              Welcome to your
+              <br />
 
-      {/* Loading */}
-      {loading ? (
-        <div className="dashboard-message">
-          <LoaderCircle className="spin" />
-          Loading your projects...
+              growth <em>journey.</em>
+            </h1>
+
+            <p>
+              Your business deserves a thoughtful
+              approach to growth. Keep track of your
+              enquiries and stay connected with
+              BRAND-ROOTS.
+            </p>
+
+            <a
+              href="/contact"
+              className="br-dashboard-cta"
+            >
+              Start a New Enquiry
+
+              <ArrowUpRight size={18} />
+            </a>
+          </div>
+
+          <div className="br-dashboard-hero-art">
+            <div className="br-dashboard-art-orbit" />
+
+            <div className="br-dashboard-art-card">
+              <span className="br-art-card-label">
+                YOUR BUSINESS
+              </span>
+
+              <div className="br-art-card-icon">
+                <BriefcaseBusiness size={28} />
+              </div>
+
+              <h3>
+                Rooted in
+                <br />
+
+                <em>possibility.</em>
+              </h3>
+
+              <div className="br-art-card-line" />
+
+              <span className="br-art-card-footer">
+                FROM ROOTS TO RECOGNITION
+              </span>
+            </div>
+
+            <div className="br-dashboard-art-dot br-dot-one" />
+            <div className="br-dashboard-art-dot br-dot-two" />
+            <div className="br-dashboard-art-dot br-dot-three" />
+          </div>
+
         </div>
-      ) : error ? (
-        <div className="dashboard-message">
-          <p>{error}</p>
+      </div>
+
+      {/* Main Dashboard */}
+      <div className="br-dashboard-content">
+
+        {/* Overview */}
+        <div className="br-dashboard-section-heading">
+          <div>
+            <span className="br-dashboard-overline">
+              YOUR OVERVIEW
+            </span>
+
+            <h2>
+              A little progress,
+              <br />
+
+              <em>every day.</em>
+            </h2>
+          </div>
 
           <button
             type="button"
-            className="button button-gold"
-            onClick={() => void fetchPlans()}
+            className="br-dashboard-refresh"
+            onClick={() => void fetchEnquiries()}
+            disabled={loading}
           >
-            Try Again
+            {loading ? (
+              <LoaderCircle
+                size={16}
+                className="br-spin"
+              />
+            ) : (
+              <RefreshCw size={16} />
+            )}
+
+            Refresh
           </button>
         </div>
-      ) : plans.length === 0 ? (
-        /* Empty State */
-        <div className="dashboard-empty">
-          <BriefcaseBusiness size={36} />
 
-          <h3>No projects yet</h3>
+        {/* Statistics */}
+        <div className="br-dashboard-stats">
 
-          <p>
-            Explore our plans and choose the right growth
-            solution for your business.
-          </p>
+          <article className="br-stat-card br-stat-total">
+            <div className="br-stat-top">
+              <span>Total Enquiries</span>
 
-          <a href="/plans" className="button button-gold">
-            Explore Plans
-          </a>
+              <div className="br-stat-icon">
+                <FileText size={19} />
+              </div>
+            </div>
+
+            <strong>
+              {loading ? "—" : enquiries.length}
+            </strong>
+
+            <p>
+              All your submitted enquiries
+            </p>
+          </article>
+
+          <article className="br-stat-card">
+            <div className="br-stat-top">
+              <span>Awaiting Review</span>
+
+              <div className="br-stat-icon">
+                <Clock3 size={19} />
+              </div>
+            </div>
+
+            <strong>
+              {loading ? "—" : pendingCount}
+            </strong>
+
+            <p>
+              Pending or contacted
+            </p>
+          </article>
+
+          <article className="br-stat-card">
+            <div className="br-stat-top">
+              <span>In Progress</span>
+
+              <div className="br-stat-icon">
+                <BriefcaseBusiness size={19} />
+              </div>
+            </div>
+
+            <strong>
+              {loading ? "—" : activeCount}
+            </strong>
+
+            <p>
+              Currently being worked on
+            </p>
+          </article>
+
+          <article className="br-stat-card">
+            <div className="br-stat-top">
+              <span>Completed</span>
+
+              <div className="br-stat-icon">
+                <CheckCircle2 size={19} />
+              </div>
+            </div>
+
+            <strong>
+              {loading ? "—" : completedCount}
+            </strong>
+
+            <p>
+              Successfully completed
+            </p>
+          </article>
+
         </div>
-      ) : (
-        /* Projects */
-        <div className="client-projects-grid">
-          {plans.map((plan) => {
-            const projectUpdates = progressUpdates
-              .filter(
-                (update) => update.enquiry_id === plan.id
-              )
-              .sort(
-                (a, b) =>
-                  new Date(b.created_at).getTime() -
-                  new Date(a.created_at).getTime()
-              );
 
-            return (
-              <article
-                className="client-project-card"
-                key={plan.id}
-              >
-                {/* Project Header */}
-                <div className="project-card-top">
-                  <span className="eyebrow">
-                    {plan.service_name}
-                  </span>
+        {/* Enquiry History */}
+        <div className="br-enquiries-section">
 
-                  <span
-                    className={`project-status status-${plan.status}`}
+          <div className="br-enquiries-heading">
+            <div>
+              <span className="br-dashboard-overline">
+                YOUR HISTORY
+              </span>
+
+              <h2>
+                My <em>Enquiries.</em>
+              </h2>
+
+              <p>
+                Every conversation is a step towards
+                building a stronger business.
+              </p>
+            </div>
+
+            <div className="br-enquiry-count">
+              <MessageSquareText size={17} />
+
+              {enquiries.length}{" "}
+              {enquiries.length === 1
+                ? "Enquiry"
+                : "Enquiries"}
+            </div>
+          </div>
+
+          {/* Search */}
+          {!loading &&
+            !error &&
+            enquiries.length > 0 && (
+              <div className="br-enquiry-search">
+                <Search size={18} />
+
+                <input
+                  type="search"
+                  placeholder="Search by plan, service or business..."
+                  value={search}
+                  onChange={(e) =>
+                    setSearch(e.target.value)
+                  }
+                  aria-label="Search enquiries"
+                />
+
+                {search && (
+                  <button
+                    type="button"
+                    onClick={() => setSearch("")}
+                    aria-label="Clear search"
                   >
-                    {STATUS_LABELS[plan.status] ??
-                      plan.status.replace("_", " ")}
-                  </span>
-                </div>
+                    Clear
+                  </button>
+                )}
+              </div>
+            )}
 
-                <h3>{plan.plan_name}</h3>
+          {/* Loading */}
+          {loading && (
+            <div className="br-dashboard-state">
+              <LoaderCircle
+                size={30}
+                className="br-spin"
+              />
 
-                <p className="project-business">
-                  {plan.business_name}
-                </p>
+              <h3>
+                Gathering your enquiries
+              </h3>
 
-                <p className="project-message">
-                  {plan.message}
-                </p>
+              <p>
+                Just a moment while we bring
+                everything together.
+              </p>
+            </div>
+          )}
 
-                {/* Project Metadata */}
-                <div className="project-card-footer">
-                  <span>
-                    <CalendarDays size={15} />
+          {/* Error */}
+          {!loading && error && (
+            <div className="br-dashboard-state">
+              <div className="br-state-icon">
+                <RefreshCw size={25} />
+              </div>
 
-                    {new Date(
-                      plan.created_at
-                    ).toLocaleDateString()}
-                  </span>
+              <h3>
+                Something went wrong
+              </h3>
 
-                  <span>Project #{plan.id}</span>
-                </div>
+              <p>{error}</p>
 
-                {/* Progress Timeline */}
-                <div className="project-progress-timeline">
-                  <div className="project-timeline-heading">
-                    <h4>Project Progress</h4>
+              <button
+                type="button"
+                className="br-dashboard-cta"
+                onClick={() => void fetchEnquiries()}
+              >
+                Try Again
 
-                    <span>
-                      {projectUpdates.length} updates
-                    </span>
+                <RefreshCw size={16} />
+              </button>
+            </div>
+          )}
+
+          {/* Empty */}
+          {!loading &&
+            !error &&
+            enquiries.length === 0 && (
+              <div className="br-dashboard-empty">
+                <div className="br-empty-illustration">
+                  <div className="br-empty-circle">
+                    <MessageSquareText size={34} />
                   </div>
-
-                  {projectUpdates.length === 0 ? (
-                    <p className="project-no-updates">
-                      No progress updates yet. Updates from
-                      BRAND-ROOTS will appear here.
-                    </p>
-                  ) : (
-                    <div className="project-update-list">
-                      {projectUpdates.map((update) => (
-                        <article
-                          className="project-update-item"
-                          key={update.id}
-                        >
-                          <div className="project-update-heading">
-                            <h5>{update.title}</h5>
-
-                            <span
-                              className={`project-status status-${update.status}`}
-                            >
-                              {STATUS_LABELS[update.status] ??
-                                update.status.replace("_", " ")}
-                            </span>
-                          </div>
-
-                          <p>{update.description}</p>
-
-                          <span className="project-update-date">
-                            <Clock size={14} />
-
-                            {new Date(
-                              update.created_at
-                            ).toLocaleDateString()}
-                          </span>
-                        </article>
-                      ))}
-                    </div>
-                  )}
                 </div>
-              </article>
-            );
-          })}
+
+                <span className="br-dashboard-overline">
+                  YOUR NEXT CHAPTER STARTS HERE
+                </span>
+
+                <h3>
+                  No enquiries, <em>just yet.</em>
+                </h3>
+
+                <p>
+                  Tell us about your business and
+                  what you want to achieve. Let's
+                  discover the right path forward,
+                  together.
+                </p>
+
+                <a
+                  href="/contact"
+                  className="br-dashboard-cta"
+                >
+                  Let's Talk Growth
+
+                  <ArrowUpRight size={18} />
+                </a>
+              </div>
+            )}
+
+          {/* No Search Results */}
+          {!loading &&
+            !error &&
+            enquiries.length > 0 &&
+            filteredEnquiries.length === 0 && (
+              <div className="br-dashboard-state">
+                <Search size={28} />
+
+                <h3>
+                  No matching enquiries
+                </h3>
+
+                <p>
+                  Try searching with a different
+                  service or business name.
+                </p>
+              </div>
+            )}
+
+          {/* Enquiry Cards */}
+          {!loading &&
+            !error &&
+            filteredEnquiries.length > 0 && (
+              <div className="br-enquiry-list">
+                {filteredEnquiries.map(
+                  (enquiry, index) => (
+                    <article
+                      className="br-enquiry-card"
+                      key={enquiry.id}
+                      style={{
+                        animationDelay: `${index * 70}ms`,
+                      }}
+                    >
+                      <div className="br-enquiry-card-top">
+
+                        <div className="br-enquiry-card-title">
+                          <span className="br-enquiry-number">
+                            ENQUIRY #{enquiry.id}
+                          </span>
+
+                          <h3>
+                            {enquiry.plan_name}
+                          </h3>
+
+                          <p>
+                            {enquiry.business_name}
+                          </p>
+                        </div>
+
+                        <span
+                          className={`br-enquiry-status ${getStatusClass(
+                            enquiry.status
+                          )}`}
+                        >
+                          <span className="br-status-dot" />
+
+                          {getStatusLabel(
+                            enquiry.status
+                          )}
+                        </span>
+
+                      </div>
+
+                      <div className="br-enquiry-card-details">
+
+                        <div className="br-enquiry-detail">
+                          <span className="br-detail-icon">
+                            <BriefcaseBusiness
+                              size={16}
+                            />
+                          </span>
+
+                          <div>
+                            <span>
+                              SERVICE
+                            </span>
+
+                            <strong>
+                              {enquiry.service_name}
+                            </strong>
+                          </div>
+                        </div>
+
+                        <div className="br-enquiry-detail">
+                          <span className="br-detail-icon">
+                            <CalendarDays
+                              size={16}
+                            />
+                          </span>
+
+                          <div>
+                            <span>
+                              SUBMITTED ON
+                            </span>
+
+                            <strong>
+                              {formatDate(
+                                enquiry.created_at
+                              )}
+                            </strong>
+                          </div>
+                        </div>
+
+                      </div>
+
+                      <div className="br-enquiry-message">
+                        <span>
+                          YOUR MESSAGE
+                        </span>
+
+                        <p>
+                          {enquiry.message ||
+                            "No additional message provided."}
+                        </p>
+                      </div>
+
+                    </article>
+                  )
+                )}
+              </div>
+            )}
+
         </div>
-      )}
+
+        {/* Bottom Note */}
+        {!loading && !error && (
+          <div className="br-dashboard-bottom-note">
+            <div className="br-bottom-note-icon">
+              <Sparkles size={19} />
+            </div>
+
+            <p>
+              <strong>
+                Every great business has a story.
+              </strong>
+
+              <br />
+
+              We're here to help you write the
+              next chapter.
+            </p>
+
+            <span>
+              BRAND-ROOTS
+            </span>
+          </div>
+        )}
+
+      </div>
     </section>
   );
 }
